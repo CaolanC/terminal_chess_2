@@ -1,3 +1,39 @@
+class Turn(object):
+
+    def __init__(self):
+        
+        self.player = "white"
+        self.wKingPos = "e1"
+        self.bKingPos = "e8"
+    
+    def Turn(self):
+        
+        return self.player
+    
+    def moveMade(self, PC, b):
+
+        if PC.piece() == "king":
+            if PC.color == "white":
+
+                self.wKingPos = b
+            
+            elif PC.color == "black":
+
+                self.bKingPos = b
+
+        if self.player ==  "white":
+            self.player = "black"
+        else:
+            self.player = "white"
+
+    def WKpos(self):
+
+        return self.wKingPos
+    
+    def BKpos(self):
+
+        return self.bKingPos
+
 class Piece(object):
 
     def __init__(self, color, piece, square, moved, symbol):
@@ -96,4 +132,70 @@ def boardUI(board):
         row += "\033[40m"
         print(row)
 
-boardUI(createBoard())
+def startGame():
+    board = createBoard()
+    turnTracker = Turn()
+    boardUI(board)
+    while True:
+        move = input()
+        parsedMoves = parseMove(move)
+        if parsedMoves[0] in board and parsedMoves[1] in board and legalMove(parsedMoves, board, turnTracker):
+            board[parsedMoves[1]] = board[parsedMoves[0]]
+            board[parsedMoves[0]] = None
+            turnTracker.moveMade()
+            boardUI(board)       
+
+
+def parseMove(move):
+    move = move.split("-")
+    a = move[0]
+    b = move[1]
+    return [a, b]
+
+def legalMove(moves, board, turnTracker):
+    a = moves[0]
+    b = moves[1]
+
+    if isTurn(a, board, turnTracker) and possibleMove(a, b, board, turnTracker):
+        return True
+    else:
+        return False
+
+def isTurn(piece, board, turnTracker):
+    
+    if turnTracker.Turn() == board[piece].COL():
+        return True
+    else:
+        return False
+
+def possibleMove(a, b, board, turnTracker):
+    aPosPiece = board[a].PC()
+    aColPiece = board[a].COL()
+    bColPiece = board[b].COL()
+
+    inCheck = putsSidesKingInCheck(a, b, turnTracker, board)
+
+    match aPosPiece:
+
+        case "pawn":
+
+            pass
+
+def putsSidesKingInCheck(a, b, turnTracker, board):
+    
+    tempBoard = board
+
+    tempBoard[b] = tempBoard[a]
+    tempBoard[a] =  None
+
+    if turnTracker.Turn() == "white":
+
+        pass
+    
+    else:
+
+        pass
+
+    return False
+
+startGame()
