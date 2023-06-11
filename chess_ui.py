@@ -103,7 +103,7 @@ def createBoard():
     board["b8"] = Piece("black", "knight", "b8", False, "\033[30m\u265e ")
     board["c8"] = Piece("black", "bishop", "c8", False, "\033[30m\u265d ")
     board["d8"] = Piece("black", "queen", "d8", False,  "\033[30m\u265b ")
-    board["e8"] = Piece("black", "king", "e8", False,   "\033[30m\u265b ")
+    board["e8"] = Piece("black", "king", "e8", False,   "\033[30m\u265a ")
     board["f8"] = Piece("black", "bishop", "f8", False, "\033[30m\u265d ")
     board["g8"] = Piece("black", "knight", "g8", False, "\033[30m\u265e ")
     board["h8"] = Piece("black", "rook", "h8", False,   "\033[30m\u265c ")
@@ -232,11 +232,46 @@ def putsSidesKingInCheck(a, b, turnTracker, board):
     print(KingL, KingN)
 
     N = nAttacking(KingL, KingN, board, tempTurnTracker.Turn())
+    RQ = rqAttacking(KingL, KingN, board, tempTurnTracker.Turn())
 
     if not N:
         return False
     else:
         return True
+    
+def rqAttacking(L, N, board, turn):
+
+    posPos = []
+
+    N = int(N)
+
+    inCheck = False
+
+    for i in range(N, 9):
+        co = L + str(i)
+        if board[co]:
+            if board[co].COL() != turn and (board[co].PC() == "rook" or board[co].PC() == "queen"):
+                return True
+            
+    for i in range(N, 0, -1):
+        co = L + str(i)
+        if board[co]:
+            if board[co].COL() != turn and (board[co].PC() == "rook" or board[co].PC() == "queen"):
+                return True    
+
+    for i in range(ord(L), 105):
+        co = chr(i) + str(N)
+        if board[co]:
+            if board[co].COL() != turn and (board[co].PC() == "rook" or board[co].PC() == "queen"):
+                return True
+            
+    for i in range(97, ord(L) + 1, -1):
+        co = chr(i) + str(N)
+        if board[co]:
+            if board[co].COL() != turn and (board[co].PC() == "rook" or board[co].PC() == "queen"):
+                return True
+            
+    return False
 
 def nAttacking(L, N, board, turn):
 
