@@ -12,8 +12,6 @@ class Turn(object):
     
     def moveMade(self, a, b):
 
-        print(a, b)
-
         if a.PC() == "king":
             if a.COL() == "white":
 
@@ -36,9 +34,12 @@ class Turn(object):
 
         return self.bKingPos
     
-    def returnSelf():
+    def invert(self):
 
-        return
+        if self.player == "white":
+            self.player = "black"
+        else:
+            self.player = "white"
 
 class Piece(object):
 
@@ -125,7 +126,7 @@ def boardUI(board):
         row = ""
         for letter in range(8):
             if bg_color % 2 == 0:
-                row += "\033[42m"
+                row += "\033[44m"
             else:
                 row += "\033[45m"
             piece = board[str(chr(letter + 97)) + str(number + 1)]
@@ -195,12 +196,6 @@ def possibleMove(a, b, board, turnTracker):
 
     inCheck = putsSidesKingInCheck(a, b, turnTracker, board)
 
-    match aPosPiece:
-
-        case "pawn":
-
-            pass
-
     if not inCheck:
 
         return True
@@ -218,27 +213,82 @@ def putsSidesKingInCheck(a, b, turnTracker, board):
     tempBoard[b] = tempBoard[a]
     tempBoard[a] =  None
 
+    tempTurnTracker.invert()
+
     if tempTurnTracker.Turn() == "black":
 
-        King = tempTurnTracker.WKpos()
+        King = tempTurnTracker.BKpos()
     
     else:
 
-        King = tempTurnTracker.BKpos()
+        King = tempTurnTracker.WKpos()
 
     KingL = King[0]
     KingN = King[1]
 
-    print(KingL, KingN)
-
-    N = nAttacking(KingL, KingN, board, tempTurnTracker.Turn())
-    RQ = rqAttacking(KingL, KingN, board, tempTurnTracker.Turn())
-
-    if not N:
+    N = nAttacking(KingL, KingN, tempBoard, tempTurnTracker.Turn())
+    RQ = rqAttacking(KingL, KingN, tempBoard, tempTurnTracker.Turn())
+    P = pAttacking(KingL, KingN, tempBoard, tempTurnTracker.Turn())
+    bqAttacking(KingL, KingN, tempBoard, tempTurnTracker.Turn())
+    if not N and not RQ and not P:
         return False
     else:
         return True
     
+def pAttacking(L, N, board, turn):
+
+    N = int(N)
+    if turn == "white":
+        leftP = chr(ord(L) - 1) + str(N + 1)
+        rightP = chr(ord(L) + 1) + str(N + 1)
+
+    elif turn == "black":
+        leftP = chr(ord(L) - 1) + str(N - 1)
+        rightP = chr(ord(L) + 1) + str(N - 1)
+
+    if turn == "white":
+        if leftP in board and board[leftP].PC() == "pawn" and board[leftP].COL() != "white":
+            return True
+        if rightP in board and board[rightP].PC() == "pawn" and board[rightP].COL() != "white":
+            return True
+    else:
+        if leftP in board and board[leftP].PC() == "pawn" and board[leftP].COL() != "black":
+            return True
+        if rightP in board and board[rightP].PC() == "pawn" and board[rightP].COL() != "black":
+            return True
+        
+    return False
+
+def bqAttacking(L, N, board, turn):
+
+    posPos = []
+
+    N = int(N)
+
+    inCheck = False
+    
+    for i in range(N, 9):
+        co = chr(ord(L) + i) + str(i + 1)
+        if (ord(L) + i) < ord("i"):
+            print(co)
+    
+    for i in range(N, 9):
+        co = chr(ord(L) - i) + str(i + 1)
+        if (ord(L) - i) > (ord("a") - 1):
+            print(co)
+
+    for i in range(1, N):
+        co = chr(ord(L) + i) + str(8 - (i))
+        if i > 0 and (ord(L) + i) < ord("i"):
+            print(co)
+    for i in range(1, N):
+        co = chr(ord(L) - i) + str(8 - (i))
+        if i > 0 and (ord(L) - i) >= ord("a"):
+            print(co)
+
+
+    return False
+
 def rqAttacking(L, N, board, turn):
 
     posPos = []
@@ -247,29 +297,46 @@ def rqAttacking(L, N, board, turn):
 
     inCheck = False
 
-    for i in range(N, 9):
+    for i in range(N + 1, 9):
         co = L + str(i)
+        # if board[co]:
+            # print(turn, co, board[co].PC(), board[co].COL())
         if board[co]:
             if board[co].COL() != turn and (board[co].PC() == "rook" or board[co].PC() == "queen"):
                 return True
             
-    for i in range(N, 0, -1):
+            elif board[co]:
+                break
+            
+    for i in range(N - 1, 0, -1):
         co = L + str(i)
+        # if board[co]:
+            # print(turn, co, board[co].PC(), board[co].COL())
         if board[co]:
             if board[co].COL() != turn and (board[co].PC() == "rook" or board[co].PC() == "queen"):
                 return True    
-
-    for i in range(ord(L), 105):
-        co = chr(i) + str(N)
-        if board[co]:
-            if board[co].COL() != turn and (board[co].PC() == "rook" or board[co].PC() == "queen"):
-                return True
+            elif board[co]:
+                break
             
-    for i in range(97, ord(L) + 1, -1):
+    for i in range(ord(L) + 1, 105):
         co = chr(i) + str(N)
+        # if board[co]:
+            # print(turn, co, board[co].PC(), board[co].COL())
         if board[co]:
             if board[co].COL() != turn and (board[co].PC() == "rook" or board[co].PC() == "queen"):
                 return True
+            elif board[co]:
+                break
+            
+    for i in range(ord(L) - 1, 97, -1):
+        co = chr(i) + str(N)
+        # if board[co]:
+            # print(turn, co, board[co].PC(), board[co].COL())
+        if board[co]:
+            if board[co].COL() != turn and (board[co].PC() == "rook" or board[co].PC() == "queen"):
+                return True
+            elif board[co]:
+                break
             
     return False
 
@@ -295,7 +362,8 @@ def nAttacking(L, N, board, turn):
     for co in posPos:
 
         piece = board[co]
-        print(piece)
+       # if piece:
+       #     print(piece.PC(), turn)
 
         if piece and piece.PC() == "knight" and piece.COL() != turn:
 
