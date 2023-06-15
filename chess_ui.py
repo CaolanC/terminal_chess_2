@@ -101,7 +101,7 @@ def createBoard():
         for letter in range(8):
             board[str(chr(letter + 97)) + str(number + 1)] = None
 
-    board["e4"] = Piece("white", "rook", "a1", False,   "\033[37m\u265c ")
+    board["a1"] = Piece("white", "rook", "a1", False,   "\033[37m\u265c ")
     board["b1"] = Piece("white", "knight", "b1", False, "\033[37m\u265e ")
     board["c1"] = Piece("white", "bishop", "c1", False, "\033[37m\u265d ")
     board["d1"] = Piece("white", "queen", "d1", False,  "\033[37m\u265b ")
@@ -485,6 +485,8 @@ def rqMovement(L, N, board, turn):
             
     return rqLegal
 
+
+
 def nMovement(L, N, board, turn):
 
     nLegal = []
@@ -513,6 +515,101 @@ def nMovement(L, N, board, turn):
 
     return nLegal
 
+def bqMovement(L, N, board, turn):
+
+    posPos = []
+
+    bqLegal = []
+
+    N = int(N)
+
+    inCheck = False
+
+    # UP RIGHT
+
+    Aletters = [chr(i) for i in range(ord(L) + 1, ord("i"))]
+    for i in range(len(Aletters)):
+        if N + i + 1 <= 8:
+            if Aletters[i] + str(N + i + 1) in board:
+                co = Aletters[i] + str(N + i + 1)
+                if board[co] and board[co].COL() != turn:
+                    bqLegal.append((LegalMove(L + str(N), co)))
+                    break
+                elif not board[co]:
+                    bqLegal.append((LegalMove(L + str(N), co)))
+
+                elif board[co] and board[co].COL() == turn:
+                    break                
+    #UP LEFT
+
+    Bletters = [chr(i) for i in range(ord("a"), ord(L))]
+    
+    for i in range(len(Bletters)):
+        if N + i + 1 <= 8:
+            if Bletters[::-1][i] + str(N + i + 1) in board:
+                co = Bletters[::-1][i] + str(N + i + 1)
+                if board[co] and board[co].COL() != turn:
+                    bqLegal.append((LegalMove(L + str(N), co)))
+                    break
+                elif not board[co]:
+                    bqLegal.append((LegalMove(L + str(N), co)))
+
+                elif board[co] and board[co].COL() == turn:
+                    break
+
+    for i in range(len(Aletters) - 1):
+        if N - i - 1 >= 1:
+            if Aletters[i] + str(N - i - 1) in board:
+                co = Aletters[i] + str(N - i - 1)
+                if board[co] and board[co].COL() != turn:
+                    bqLegal.append((LegalMove(L + str(N), co)))
+                    break
+                elif not board[co]:
+                    bqLegal.append((LegalMove(L + str(N), co)))
+
+                elif board[co] and board[co].COL() == turn:
+                    break  
+
+    for i in range(len(Bletters) - 1):
+        if N - i - 1 >= 1:
+            if Bletters[::-1][i] + str(N - i - 1) in board:
+                co = Bletters[::-1][i] + str(N - i - 1)
+                if board[co] and board[co].COL() != turn:
+                    bqLegal.append((LegalMove(L + str(N), co)))
+                    break
+                elif not board[co]:
+                    bqLegal.append((LegalMove(L + str(N), co)))
+
+                elif board[co] and board[co].COL() == turn:
+                    break
+
+    return bqLegal
+
+def kMovement(L, N, board, turn):
+
+    kLegal = []
+
+    N = int(N)
+
+    uu = L + str(N + 1)
+    ur = chr(ord(L) + 1) + str(N + 1)
+    ul = chr(ord(L) - 1) + str(N + 1)
+    rr = chr(ord(L) + 1) + str(N)
+    ll = chr(ord(L) - 1) + str(N)
+    dd = L + str(N - 1)
+    dr = chr(ord(L) + 1) + str(N - 1)
+    dl = chr(ord(L) - 1) + str(N - 1)
+
+    coords = [uu, ur, ul, rr, ll, dd, dr, dl]
+
+    for co in coords:
+        if co in board and not board[co]:
+            kLegal.append(LegalMove(L + str(N), co))
+        elif co in board and board[co].COL() != turn:
+            kLegal.append(LegalMove(L + str(N), co))
+
+    return kLegal
+
 def checklegal(turn):
 
     legalMoves = []
@@ -526,7 +623,14 @@ def checklegal(turn):
         elif board[square] and board[square].PC() == "knight" and board[square].COL() == turn:
             [legalMoves.append(i) for i in nMovement(square[0], square[1], board, turn)]
 
+        elif board[square] and (board[square].PC() == "bishop" or board[square].PC() == "queen") and board[square].COL() == turn:
+            [legalMoves.append(i) for i in bqMovement(square[0], square[1], board, turn)]        
         
+        elif board[square] and board[square].PC() == "king" and board[square].COL() == turn:
+            [legalMoves.append(i) for i in kMovement(square[0], square[1], board, turn)]
+
+    for move in legalMoves:
+        print(str(move))
 
 def test():
 
@@ -535,10 +639,14 @@ def test():
     board = createBoard()
     boardUI(board)
     for square in board:
-        if board[square] and board[square].PC() == "knight" and board[square].COL() == "white":
-            [lN.append(i) for i in nMovement(square[0], square[1], board, "white")]
+        if board[square] and board[square].PC() == "king" and board[square].COL() == "white":
+            [lN.append(i) for i in kMovement(square[0], square[1], board, "white")]
 
+    for i in lN:
+        print(i)
 
-test()
+checklegal("white")
 
-# startGame()
+# test()
+
+#startGame()
