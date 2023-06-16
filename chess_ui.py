@@ -192,6 +192,23 @@ def startGame():
 
     while True:
 
+
+        legal_moves = checklegal(turnTracker.Turn(), board, "string_move", enpSQ)
+
+        print(legal_moves)
+
+        if checkmate(legal_moves, board, turnTracker):
+
+            if turnTracker.Turn() == "white":
+
+                winner = "Black"
+
+            else:
+
+                winner = "White"
+
+            print("Checkmate! " + winner + "wins!")
+
         move = input()
         parsedMoves = parseMove(move)
 
@@ -285,6 +302,16 @@ def startGame():
                             board["c8"].MOVED()
                             board["d8"].MOVED()
                             boardUI(board)
+
+def checkmate(moves, board, turn):
+
+    for move in moves:
+        if legalMove(parseMove(move), board, turn):
+
+            return False
+        
+    return True
+            
 def inCheck(turnTracker, board, position=None):
     
     tempBoard = board.copy()
@@ -709,7 +736,7 @@ def bqMovement(L, N, board, turn):
                 elif board[co] and board[co].COL() == turn:
                     break
 
-    for i in range(len(Aletters) - 1):
+    for i in range(len(Aletters)):
         if N - i - 1 >= 1:
             if Aletters[i] + str(N - i - 1) in board:
                 co = Aletters[i] + str(N - i - 1)
@@ -722,7 +749,7 @@ def bqMovement(L, N, board, turn):
                 elif board[co] and board[co].COL() == turn:
                     break  
 
-    for i in range(len(Bletters) - 1):
+    for i in range(len(Bletters)):
         if N - i - 1 >= 1:
             if Bletters[::-1][i] + str(N - i - 1) in board:
                 co = Bletters[::-1][i] + str(N - i - 1)
@@ -813,16 +840,16 @@ def checklegal(turn, board, option, enpSQ):
             [legalMoves.append(i) for i in rqMovement(square[0], square[1], board, turn)]
 
         elif board[square] and board[square].PC() == "knight" and board[square].COL() == turn:
-            [legalMoves.append(i) for i in nMovement(square[0], square[1], board, turn)]
-
-        elif board[square] and (board[square].PC() == "bishop" or board[square].PC() == "queen") and board[square].COL() == turn:
-            [legalMoves.append(i) for i in bqMovement(square[0], square[1], board, turn)]        
+            [legalMoves.append(i) for i in nMovement(square[0], square[1], board, turn)]    
         
         elif board[square] and board[square].PC() == "king" and board[square].COL() == turn:
             [legalMoves.append(i) for i in kMovement(square[0], square[1], board, turn)]
 
         elif board[square] and board[square].PC() == "pawn" and board[square].COL() == turn:
             [legalMoves.append(i) for i in pMovement(square[0], square[1], board, turn, enpSQ)]
+
+        if board[square] and (board[square].PC() == "bishop" or board[square].PC() == "queen") and board[square].COL() == turn:
+            [legalMoves.append(i) for i in bqMovement(square[0], square[1], board, turn)]    
 
     legalM = []
 
