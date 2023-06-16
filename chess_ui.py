@@ -1,5 +1,7 @@
 #Global Variables
 
+global x
+
 class enPassantableSquareObject(object):
 
     def __init__(self, square, color):
@@ -123,30 +125,30 @@ def createBoard():
             board[str(chr(letter + 97)) + str(number + 1)] = None
 
     board["a1"] = Piece("white", "rook", "a1", False,   "\033[37m\u265c ")
-    board["b1"] = Piece("white", "knight", "b1", False, "\033[37m\u265e ")
-    board["c1"] = Piece("white", "bishop", "c1", False, "\033[37m\u265d ")
-    board["d1"] = Piece("white", "queen", "d1", False,  "\033[37m\u265b ")
+    board["b3"] = Piece("white", "knight", "b1", False, "\033[37m\u265e ")
+    board["c3"] = Piece("white", "bishop", "c1", False, "\033[37m\u265d ")
+    board["d3"] = Piece("white", "queen", "d1", False,  "\033[37m\u265b ")
     board["e1"] = Piece("white", "king", "e1", False,   "\033[37m\u265a ")
-    board["f1"] = Piece("white", "bishop", "f1", False, "\033[37m\u265d ")
-    board["g1"] = Piece("white", "knight", "g1", False, "\033[37m\u265e ")
+    board["f3"] = Piece("white", "bishop", "f1", False, "\033[37m\u265d ")
+    board["g3"] = Piece("white", "knight", "g1", False, "\033[37m\u265e ")
     board["h1"] = Piece("white", "rook", "h1", False,   "\033[37m\u265c ")
 
-    board["a2"] = Piece("white", "pawn", "a2", False, "\033[37m\u265F\033[37m ")
-    board["b2"] = Piece("white", "pawn", "b2", False, "\033[37m\u265F\033[37m ")
-    board["c2"] = Piece("white", "pawn", "c2", False, "\033[37m\u265F\033[37m ")
-    board["d2"] = Piece("white", "pawn", "d2", False, "\033[37m\u265F\033[37m ")
-    board["e2"] = Piece("white", "pawn", "e2", False, "\033[37m\u265F\033[37m ")
-    board["f2"] = Piece("white", "pawn", "f2", False, "\033[37m\u265F\033[37m ")
-    board["g2"] = Piece("white", "pawn", "g2", False, "\033[37m\u265F\033[37m ")
-    board["h2"] = Piece("white", "pawn", "h2", False, "\033[37m\u265F\033[37m ")
+    board["a2"] = Piece("white", "pawn", "a2", False, "\033[37m\u2659 ")
+    board["b2"] = Piece("white", "pawn", "b2", False, "\033[37m\u2659 ")
+    board["c2"] = Piece("white", "pawn", "c2", False, "\033[37m\u2659 ")
+    board["d2"] = Piece("white", "pawn", "d2", False, "\033[37m\u2659 ")
+    board["e2"] = Piece("white", "pawn", "e2", False, "\033[37m\u2659 ")
+    board["f2"] = Piece("white", "pawn", "f2", False, "\033[37m\u2659 ")
+    board["g2"] = Piece("white", "pawn", "g2", False, "\033[37m\u2659 ")
+    board["h2"] = Piece("white", "pawn", "h2", False, "\033[37m\u2659 ")
 
     board["a8"] = Piece("black", "rook", "a8", False,   "\033[30m\u265c ")
-    board["b8"] = Piece("black", "knight", "b8", False, "\033[30m\u265e ")
-    board["c8"] = Piece("black", "bishop", "c8", False, "\033[30m\u265d ")
-    board["d8"] = Piece("black", "queen", "d8", False,  "\033[30m\u265b ")
+    board["b6"] = Piece("black", "knight", "b8", False, "\033[30m\u265e ")
+    board["c6"] = Piece("black", "bishop", "c8", False, "\033[30m\u265d ")
+    board["d6"] = Piece("black", "queen", "d8", False,  "\033[30m\u265b ")
     board["e8"] = Piece("black", "king", "e8", False,   "\033[30m\u265a ")
-    board["f8"] = Piece("black", "bishop", "f8", False, "\033[30m\u265d ")
-    board["g8"] = Piece("black", "knight", "g8", False, "\033[30m\u265e ")
+    board["f6"] = Piece("black", "bishop", "f8", False, "\033[30m\u265d ")
+    board["g6"] = Piece("black", "knight", "g8", False, "\033[30m\u265e ")
     board["h8"] = Piece("black", "rook", "h8", False,   "\033[30m\u265c ")
 
     board["a7"] = Piece("black", "pawn", "a7", False, "\033[30m\u265F ")
@@ -218,7 +220,105 @@ def startGame():
             board[parsedMoves[0]].MOVED()
             board[parsedMoves[1]] = board[parsedMoves[0]]
             board[parsedMoves[0]] = None
-            boardUI(board)       
+            boardUI(board)
+
+        elif move == "O-O-O" or move == "0-0-0":
+            if not inCheck(turnTracker, board):
+                if turnTracker.Turn() == "white":
+                    if not inCheck(turnTracker, board, "f1") and not inCheck(turnTracker, board, "g1"):
+                        if not board["f1"] and not board["g1"] and board["h1"].PC() == "rook" and board["h1"].COL() == turnTracker.Turn() and not board["h1"].hasMoved():
+
+                            turnTracker.moveMade(board["e1"], board["g1"])
+
+                            board["g1"] = board["e1"]
+                            board["e1"] = None
+                            board["f1"] = board["h1"]
+                            board["h1"] = None
+
+                            board["g1"].MOVED()
+                            board["f1"].MOVED()
+                            boardUI(board)
+                elif turnTracker.Turn() == "black":
+                    if not inCheck(turnTracker, board, "f8") and not inCheck(turnTracker, board, "g8"):
+                        if not board["f8"] and not board["g8"] and board["h8"].PC() == "rook" and board["h8"].COL() == turnTracker.Turn() and not board["h8"].hasMoved():
+
+                            turnTracker.moveMade(board["e8"], board["g8"])
+
+                            board["g8"] = board["e8"]
+                            board["e8"] = None
+                            board["f8"] = board["h8"]
+                            board["h8"] = None
+
+                            board["g8"].MOVED()
+                            board["f8"].MOVED()
+                            boardUI(board)
+
+
+        elif move == "O-O" or move == "0-0":
+
+            if not inCheck(turnTracker, board):
+                if turnTracker.Turn() == "white":
+                    if not inCheck(turnTracker, board, "d1") and not inCheck(turnTracker, board, "c1"):
+                        if not board["d1"] and not board["c1"] and board["a1"].PC() == "rook" and board["a1"].COL() == turnTracker.Turn() and not board["a1"].hasMoved():
+
+                            turnTracker.moveMade(board["e1"], board["c1"])
+
+                            board["c1"] = board["e1"]
+                            board["e1"] = None
+                            board["d1"] = board["a1"]
+                            board["a1"] = None
+
+                            board["c1"].MOVED()
+                            board["d1"].MOVED()
+                            boardUI(board)
+                elif turnTracker.Turn() == "black":
+                    if not inCheck(turnTracker, board, "d8") and not inCheck(turnTracker, board, "c8"):
+                        if not board["d8"] and not board["c8"] and board["a8"].PC() == "rook" and board["a8"].COL() == turnTracker.Turn() and not board["a8"].hasMoved():
+
+                            turnTracker.moveMade(board["e8"], board["c8"])
+
+                            board["c8"] = board["e8"]
+                            board["e8"] = None
+                            board["d8"] = board["a8"]
+                            board["a8"] = None
+
+                            board["c8"].MOVED()
+                            board["d8"].MOVED()
+                            boardUI(board)
+def inCheck(turnTracker, board, position=None):
+    
+    tempBoard = board.copy()
+    tempTurnTracker = Turn(turnTracker.Turn(), turnTracker.WKpos(), turnTracker.BKpos())
+
+    if not position and tempTurnTracker.Turn() == "black":
+
+        King = tempTurnTracker.BKpos()
+        KingL = King[0]
+        KingN = King[1]
+
+    elif not position:
+
+        King = tempTurnTracker.WKpos()
+        KingL = King[0]
+        KingN = King[1]
+
+    else:
+
+        KingL = position[0]
+        KingN = position[1]
+
+    N = nAttacking(KingL, KingN, tempBoard, tempTurnTracker.Turn())
+    RQ = rqAttacking(KingL, KingN, tempBoard, tempTurnTracker.Turn())
+    P = pAttacking(KingL, KingN, tempBoard, tempTurnTracker.Turn())
+    BQ = bqAttacking(KingL, KingN, tempBoard, tempTurnTracker.Turn())
+    K = kAttacking(KingL, KingN, tempBoard, tempTurnTracker.Turn())
+
+    print(N, RQ, P, BQ, K)
+
+    if not N and not RQ and not P and not BQ and not K:
+        return False
+    else:
+        return True
 
 def genEnPassentSquare(pc, turn, dest, board):
 
@@ -329,7 +429,7 @@ def kAttacking(L, N, board, turn):
 
     for co in coords:
         if co in board and board[co]:
-            if board[co].PC() == "king":
+            if board[co].PC() == "king" and board[co].COL() != turn:
                return True
     return False
 
@@ -709,9 +809,6 @@ def pMovement(L, N, board, turn, enpSQ):
     
 
 def checklegal(turn, board, option, enpSQ):
-
-    if enpSQ:
-        print(enpSQ, enpSQ.enSquare(), enpSQ.enColor())
 
     legalMoves = []
 
