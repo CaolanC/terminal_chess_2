@@ -172,7 +172,7 @@ def startGame():
         move = input()
         parsedMoves = parseMove(move)
 
-        if parsedMoves[0] in board and parsedMoves[1] in board and legalMove(parsedMoves, board, turnTracker) and move in checklegal(turnTracker.Turn(), board):
+        if parsedMoves[0] in board and parsedMoves[1] in board and legalMove(parsedMoves, board, turnTracker) and move in checklegal(turnTracker.Turn(), board, "string_move"):
 
             turnTracker.moveMade(board[parsedMoves[0]], board[parsedMoves[1]])
             board[parsedMoves[0]].MOVED()
@@ -645,7 +645,7 @@ def pMovement(L, N, board, turn):
 
     
 
-def checklegal(turn, board):
+def checklegal(turn, board, option):
 
     legalMoves = []
 
@@ -667,9 +667,14 @@ def checklegal(turn, board):
 
     legalM = []
 
-    for move in legalMoves:
-        legalM.append(str(move))
-    return legalM
+    if option == "string_move":
+        for move in legalMoves:
+            legalM.append(str(move))
+        return legalM
+    
+    elif option == "object_move":
+
+        return legalMoves
 
 def test():
 
