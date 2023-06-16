@@ -1,6 +1,23 @@
 #Global Variables
 
-enPassentSquare = None
+class enPassantableSquareObject(object):
+
+    def __init__(self, square, color):
+
+        self.square = square
+        self.color = color
+    
+    def enSquare(self):
+
+        return self.square
+    
+    def enColor(self):
+
+        return self.color
+    
+    def __bool__(self):
+
+        return True
 
 class LegalMove(object):
 
@@ -167,19 +184,53 @@ def startGame():
     turnTracker = Turn()
     boardUI(board)
 
+    
+    enpSQ = None
+
+
     while True:
 
         move = input()
         parsedMoves = parseMove(move)
 
-        if parsedMoves[0] in board and parsedMoves[1] in board and legalMove(parsedMoves, board, turnTracker) and move in checklegal(turnTracker.Turn(), board, "string_move"):
+        if parsedMoves[0] in board and parsedMoves[1] in board and legalMove(parsedMoves, board, turnTracker) and move in checklegal(turnTracker.Turn(), board, "string_move", enpSQ):
+
+            if enpSQ:
+                if board[parsedMoves[0]].PC() == "pawn":
+                    if turnTracker.Turn() == "white" and parsedMoves[1] == enpSQ.enSquare():
+                        LE = parsedMoves[1][0]
+                        NU = parsedMoves[1][1]
+                        board[LE + str(int(NU) - 1)] = None
+
+                    elif turnTracker.Turn() == "black" and parsedMoves[1] == enpSQ.enSquare():
+                        LE = parsedMoves[1][0]
+                        NU = parsedMoves[1][1]
+                        board[LE + str(int(NU) + 1)] = None
+
+            if not board[parsedMoves[0]].hasMoved():
+                if board[parsedMoves[0]].PC() == "pawn":
+                    enpSQ = genEnPassentSquare(parsedMoves[0], turnTracker.Turn(), parsedMoves[1], board)
+            else:
+                enpSQ = None
 
             turnTracker.moveMade(board[parsedMoves[0]], board[parsedMoves[1]])
+
             board[parsedMoves[0]].MOVED()
             board[parsedMoves[1]] = board[parsedMoves[0]]
             board[parsedMoves[0]] = None
             boardUI(board)       
 
+def genEnPassentSquare(pc, turn, dest, board):
+
+    print(turn)
+
+    if turn == "white" and dest == pc[0] + str(int(pc[1]) + 2):
+
+        return enPassantableSquareObject(pc[0] + str(int(pc[1]) + 1), turn)
+    
+    if turn == "black" and dest == pc[0] + str(int(pc[1]) - 2):
+
+        return enPassantableSquareObject(pc[0] + str(int(pc[1]) - 1), turn)
 
 def parseMove(move):
 
@@ -615,7 +666,15 @@ def kMovement(L, N, board, turn):
 
     return kLegal
 
-def pMovement(L, N, board, turn):
+def pMovement(L, N, board, turn, enpSQ):
+
+    if enpSQ:
+
+        enBool = True
+
+    else:
+
+        enBool = False
 
     N = int(N)
 
@@ -634,7 +693,11 @@ def pMovement(L, N, board, turn):
             moveable.append(L + str(N - 2))
 
     for sq in attackable:
-        if sq in board and board[sq] and board[sq].COL() != turn:
+
+        if sq in board and (board[sq] and board[sq].COL() != turn):
+            pLegal.append(LegalMove(L + str(N), sq))
+
+        if (sq in board and not board[sq] and enBool and enpSQ.enColor() != turn and enpSQ.enSquare() == sq):
             pLegal.append(LegalMove(L + str(N), sq))
 
     for sq in moveable:
@@ -645,7 +708,10 @@ def pMovement(L, N, board, turn):
 
     
 
-def checklegal(turn, board, option):
+def checklegal(turn, board, option, enpSQ):
+
+    if enpSQ:
+        print(enpSQ, enpSQ.enSquare(), enpSQ.enColor())
 
     legalMoves = []
 
@@ -663,7 +729,7 @@ def checklegal(turn, board, option):
             [legalMoves.append(i) for i in kMovement(square[0], square[1], board, turn)]
 
         elif board[square] and board[square].PC() == "pawn" and board[square].COL() == turn:
-            [legalMoves.append(i) for i in pMovement(square[0], square[1], board, turn)]
+            [legalMoves.append(i) for i in pMovement(square[0], square[1], board, turn, enpSQ)]
 
     legalM = []
 
