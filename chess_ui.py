@@ -1,3 +1,7 @@
+#Global Variables
+
+enPassentSquare = None
+
 class LegalMove(object):
 
     def __init__(self, origin, destination):
@@ -168,9 +172,10 @@ def startGame():
         move = input()
         parsedMoves = parseMove(move)
 
-        if parsedMoves[0] in board and parsedMoves[1] in board and legalMove(parsedMoves, board, turnTracker):
+        if parsedMoves[0] in board and parsedMoves[1] in board and legalMove(parsedMoves, board, turnTracker) and move in checklegal(turnTracker.Turn(), board):
 
             turnTracker.moveMade(board[parsedMoves[0]], board[parsedMoves[1]])
+            board[parsedMoves[0]].MOVED()
             board[parsedMoves[1]] = board[parsedMoves[0]]
             board[parsedMoves[0]] = None
             boardUI(board)       
@@ -610,12 +615,40 @@ def kMovement(L, N, board, turn):
 
     return kLegal
 
-def checklegal(turn):
+def pMovement(L, N, board, turn):
+
+    N = int(N)
+
+    pLegal = []
+
+    if turn == "white":
+        attackable = [chr(ord(L) + 1) + str(N + 1), chr(ord(L) - 1) + str(N + 1)]
+        moveable = [L + str(N + 1)]
+        if not board[L + str(N)].hasMoved():
+            moveable.append(L + str(N + 2))
+
+    else:
+        attackable = [chr(ord(L) + 1) + str(N - 1), chr(ord(L) - 1) + str(N - 1)]
+        moveable = [L + str(N - 1)]
+        if not board[L + str(N)].hasMoved():
+            moveable.append(L + str(N - 2))
+
+    for sq in attackable:
+        if sq in board and board[sq] and board[sq].COL() != turn:
+            pLegal.append(LegalMove(L + str(N), sq))
+
+    for sq in moveable:
+        if sq in board and not board[sq]:
+            pLegal.append(LegalMove(L + str(N), sq))
+
+    return pLegal
+
+    
+
+def checklegal(turn, board):
 
     legalMoves = []
 
-    board = createBoard()
-    boardUI(board)
     for square in board:
         if board[square] and (board[square].PC() == "rook" or board[square].PC() == "queen") and board[square].COL() == turn:
             [legalMoves.append(i) for i in rqMovement(square[0], square[1], board, turn)]
@@ -629,8 +662,14 @@ def checklegal(turn):
         elif board[square] and board[square].PC() == "king" and board[square].COL() == turn:
             [legalMoves.append(i) for i in kMovement(square[0], square[1], board, turn)]
 
+        elif board[square] and board[square].PC() == "pawn" and board[square].COL() == turn:
+            [legalMoves.append(i) for i in pMovement(square[0], square[1], board, turn)]
+
+    legalM = []
+
     for move in legalMoves:
-        print(str(move))
+        legalM.append(str(move))
+    return legalM
 
 def test():
 
@@ -639,14 +678,14 @@ def test():
     board = createBoard()
     boardUI(board)
     for square in board:
-        if board[square] and board[square].PC() == "king" and board[square].COL() == "white":
-            [lN.append(i) for i in kMovement(square[0], square[1], board, "white")]
+        if board[square] and board[square].PC() == "pawn" and board[square].COL() == "white":
+            [lN.append(i) for i in pMovement(square[0], square[1], board, "white")]
 
     for i in lN:
         print(i)
 
-checklegal("white")
+# checklegal("white")
 
 # test()
 
-#startGame()
+startGame()
