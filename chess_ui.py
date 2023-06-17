@@ -1,6 +1,6 @@
 # Global Variables
 
-global x
+import chess_engine
 
 class enPassantableSquareObject(object):
 
