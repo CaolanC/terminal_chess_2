@@ -1,7 +1,5 @@
 # Global Variables
 
-import chess_engine
-
 class enPassantableSquareObject(object):
 
     def __init__(self, square, color):
@@ -25,20 +23,20 @@ class LegalMove(object):
 
     def __init__(self, origin, destination):
 
-        self.origin = origin
-        self.destination = destination
+        self.orgn = origin
+        self.dest = destination
 
     def origin(self):
         
-        return self.origin
+        return self.orgn
 
     def destination(self):
 
-        return self.destination
+        return self.dest
     
     def __str__(self):
 
-        return self.origin + '-' + self.destination
+        return self.orgn + '-' + self.dest
 
 class Turn(object):
 
@@ -875,4 +873,129 @@ def test():
 
 # test()
 
-startGame()
+# startGame()
+
+def startChessEngine():
+
+    board = createBoard()
+    turnTracker = Turn()
+    boardUI(board)
+
+    
+    enpSQ = None
+
+
+    while True:
+
+
+        legal_moves = checklegal(turnTracker.Turn(), board, "string_move", enpSQ)
+        engine_moves = checklegal(turnTracker.Turn(), board, "object_move", enpSQ)
+        if checkmate(legal_moves, board, turnTracker):
+
+            if turnTracker.Turn() == "white":
+
+                winner = "Black"
+
+            else:
+
+                winner = "White"
+
+            print("Checkmate! " + winner + " wins!")
+
+     #    move = chess_engine.engine(board, turnTracker.Turn(), engine_moves)
+        parsedMoves = parseMove(move)
+
+        if parsedMoves[0] in board and parsedMoves[1] in board and legalMove(parsedMoves, board, turnTracker) and move in checklegal(turnTracker.Turn(), board, "string_move", enpSQ):
+
+            if enpSQ:
+                if board[parsedMoves[0]].PC() == "pawn":
+                    if turnTracker.Turn() == "white" and parsedMoves[1] == enpSQ.enSquare():
+                        LE = parsedMoves[1][0]
+                        NU = parsedMoves[1][1]
+                        board[LE + str(int(NU) - 1)] = None
+
+                    elif turnTracker.Turn() == "black" and parsedMoves[1] == enpSQ.enSquare():
+                        LE = parsedMoves[1][0]
+                        NU = parsedMoves[1][1]
+                        board[LE + str(int(NU) + 1)] = None
+
+            if not board[parsedMoves[0]].hasMoved():
+                if board[parsedMoves[0]].PC() == "pawn":
+                    enpSQ = genEnPassentSquare(parsedMoves[0], turnTracker.Turn(), parsedMoves[1], board)
+            else:
+                enpSQ = None
+
+            turnTracker.moveMade(board[parsedMoves[0]], board[parsedMoves[1]])
+
+            board[parsedMoves[0]].MOVED()
+            board[parsedMoves[1]] = board[parsedMoves[0]]
+            board[parsedMoves[0]] = None
+            boardUI(board)
+
+        elif move == "O-O" or move == "0-0":
+            if not inCheck(turnTracker, board):
+                if turnTracker.Turn() == "white":
+                    if not inCheck(turnTracker, board, "f1") and not inCheck(turnTracker, board, "g1"):
+                        if not board["f1"] and not board["g1"] and board["h1"].PC() == "rook" and board["h1"].COL() == turnTracker.Turn() and not board["h1"].hasMoved():
+
+                            turnTracker.moveMade(board["e1"], "g1")
+
+                            board["g1"] = board["e1"]
+                            board["e1"] = None
+                            board["f1"] = board["h1"]
+                            board["h1"] = None
+
+                            board["g1"].MOVED()
+                            board["f1"].MOVED()
+                            boardUI(board)
+                elif turnTracker.Turn() == "black":
+                    if not inCheck(turnTracker, board, "f8") and not inCheck(turnTracker, board, "g8"):
+                        if not board["f8"] and not board["g8"] and board["h8"].PC() == "rook" and board["h8"].COL() == turnTracker.Turn() and not board["h8"].hasMoved():
+
+                            turnTracker.moveMade(board["e8"], "g8")
+
+                            board["g8"] = board["e8"]
+                            board["e8"] = None
+                            board["f8"] = board["h8"]
+                            board["h8"] = None
+
+                            board["g8"].MOVED()
+                            board["f8"].MOVED()
+                            boardUI(board)
+
+
+        elif move == "O-O-O" or move == "0-0-0":
+
+            if not inCheck(turnTracker, board):
+                if turnTracker.Turn() == "white":
+                    if not inCheck(turnTracker, board, "d1") and not inCheck(turnTracker, board, "c1"):
+                        if not board["d1"] and not board["c1"] and board["a1"].PC() == "rook" and board["a1"].COL() == turnTracker.Turn() and not board["a1"].hasMoved():
+
+                            turnTracker.moveMade(board["e1"], "c1")
+
+                            board["c1"] = board["e1"]
+                            board["e1"] = None
+                            board["d1"] = board["a1"]
+                            board["a1"] = None
+
+                            board["c1"].MOVED()
+                            board["d1"].MOVED()
+                            boardUI(board)
+                elif turnTracker.Turn() == "black":
+                    if not inCheck(turnTracker, board, "d8") and not inCheck(turnTracker, board, "c8"):
+                        if not board["d8"] and not board["c8"] and board["a8"].PC() == "rook" and board["a8"].COL() == turnTracker.Turn() and not board["a8"].hasMoved():
+
+                            turnTracker.moveMade(board["e8"], "c8")
+
+                            board["c8"] = board["e8"]
+                            board["e8"] = None
+                            board["d8"] = board["a8"]
+                            board["a8"] = None
+
+                            board["c8"].MOVED()
+                            board["d8"].MOVED()
+                            boardUI(board)
+
+
+
+# startChessEngine()
