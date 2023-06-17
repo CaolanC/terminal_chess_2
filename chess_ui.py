@@ -1,4 +1,4 @@
-#Global Variables
+# Global Variables
 
 global x
 
@@ -194,9 +194,6 @@ def startGame():
 
 
         legal_moves = checklegal(turnTracker.Turn(), board, "string_move", enpSQ)
-
-        print(legal_moves)
-
         if checkmate(legal_moves, board, turnTracker):
 
             if turnTracker.Turn() == "white":
@@ -207,7 +204,7 @@ def startGame():
 
                 winner = "White"
 
-            print("Checkmate! " + winner + "wins!")
+            print("Checkmate! " + winner + " wins!")
 
         move = input()
         parsedMoves = parseMove(move)
@@ -307,7 +304,6 @@ def checkmate(moves, board, turn):
 
     for move in moves:
         if legalMove(parseMove(move), board, turn):
-
             return False
         
     return True
@@ -513,7 +509,7 @@ def bqAttacking(L, N, board, turn):
                 else:
                     break
 
-    for i in range(len(Aletters) - 1):
+    for i in range(len(Aletters)):
         if N - i - 1 >= 1:
             if board[Aletters[i] + str(N - i - 1)]:
                 co = board[Aletters[i] + str(N - i - 1)]
@@ -522,7 +518,7 @@ def bqAttacking(L, N, board, turn):
                 else:
                     break
 
-    for i in range(len(Bletters) - 1):
+    for i in range(len(Bletters)):
         if N - i - 1 >= 1:
             if board[Bletters[::-1][i] + str(N - i - 1)]:
                 co = board[Bletters[::-1][i] + str(N - i - 1)]
