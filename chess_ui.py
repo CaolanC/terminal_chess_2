@@ -799,15 +799,22 @@ def pMovement(L, N, board, turn, enpSQ):
 
     if turn == "white":
         attackable = [chr(ord(L) + 1) + str(N + 1), chr(ord(L) - 1) + str(N + 1)]
-        moveable = [L + str(N + 1)]
+        moveable = []
         if not board[L + str(N)].hasMoved():
-            moveable.append(L + str(N + 2))
+            if not board[L + str(N + 1)] and not board[L + str(N + 2)]:
+                moveable.append(L + str(N + 2))
+
+            if not board[L + str(N + 1)]:
+                moveable.append(L + str(N + 1))
 
     else:
         attackable = [chr(ord(L) + 1) + str(N - 1), chr(ord(L) - 1) + str(N - 1)]
-        moveable = [L + str(N - 1)]
+        moveable = []
         if not board[L + str(N)].hasMoved():
-            moveable.append(L + str(N - 2))
+            if not board[L + str(N - 2)] and not board[L + str(N - 1)]:
+                moveable.append(L + str(N - 2))
+        if not board[L + str(N - 1)]:
+            moveable.append(L + str(N - 1))            
 
     for sq in attackable:
 
