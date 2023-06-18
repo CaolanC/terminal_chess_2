@@ -876,11 +876,11 @@ def test():
     for i in lN:
         print(i)
 
-# checklegal("white")
+checklegal("white", createBoard(), "string_move", None)
 
-# test()
+#test()
 
-# startGame()
+#startGame()
 
 def startChessEngine():
 

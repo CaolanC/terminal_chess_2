@@ -123,8 +123,8 @@ def engine(mvs, board, turn, depth):
 
                 # system("clear")
             
-                # boardUI(new_B)
-                # input()
+                boardUI(new_B)
+                input()
 
                 if turn == "white":
 
