@@ -804,8 +804,8 @@ def pMovement(L, N, board, turn, enpSQ):
             if not board[L + str(N + 1)] and not board[L + str(N + 2)]:
                 moveable.append(L + str(N + 2))
 
-            if not board[L + str(N + 1)]:
-                moveable.append(L + str(N + 1))
+        if not board[L + str(N + 1)]:
+            moveable.append(L + str(N + 1))
 
     else:
         attackable = [chr(ord(L) + 1) + str(N - 1), chr(ord(L) - 1) + str(N - 1)]
@@ -876,7 +876,7 @@ def test():
     for i in lN:
         print(i)
 
-checklegal("white", createBoard(), "string_move", None)
+# checklegal("white", createBoard(), "string_move", None)
 
 #test()
 
