@@ -43,7 +43,6 @@ global positions
 positions = 0
 
 def eval(board):
-
     w_score = 0
     b_score = 0
 
