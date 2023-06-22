@@ -143,4 +143,103 @@ def engine(mvs, board, turn, depth):
                     turn = "white"
         print(positions)
 
-engine(checklegal(turnTracker.Turn(), board, "object_move", enpSQ), board, turnTracker.Turn(), 3)
+# engine(checklegal(turnTracker.Turn(), board, "object_move", enpSQ), board, turnTracker.Turn(), 3)
+
+class Node(object):
+
+    def __init__(self, move, value, children):
+
+        self.value = value
+        self.move = move
+        self.children = children
+
+    def val(self):
+
+        return (self.value)
+    
+    def mv(self):
+
+        return (self.move)
+
+    def kids(self):
+
+        return self.children
+
+class Tree(object):
+
+    def __init__(self, board, turn="white", maxdepth=3):
+
+        self.board = board
+        self.turn = turn
+        self.maxdepth = maxdepth
+        self.turn = turn
+
+
+    def invertTurn(self):
+
+        if self.turn == "white":
+            self.turn = "black"
+        elif self.turn == "black":
+            self.turn = "white"
+
+    def makeTree(self, depth=0, board=None):
+
+        if not board:
+
+            board = self.board
+
+        self.tree = Node(None, 0, self.getBottomDepth(depth, board))
+
+    def getBottomDepth(self, depth, board):
+
+        new_B = board.copy()
+
+        moves = checklegal(self.turn, new_B, "object_move", enpSQ)
+
+        if depth == self.maxdepth:
+
+            children = []
+
+            for move in moves:
+
+                children.append(Node(move, eval(doMove(move,new_B)), None))
+
+            return children
+        
+        else:
+
+            children = []
+
+            self.invertTurn()
+
+            for move in moves:
+
+                children.append(Node(move, None, self.getBottomDepth(depth + 1, new_B)))
+
+            return children
+        
+    def exploreTree(self, branch=None):
+
+        if not branch:
+
+            branch = self.tree
+
+        if branch.kids():
+
+            for node in branch.kids():
+
+                print("PARENT")
+                self.exploreTree(node)
+        
+        elif branch.val():
+
+            print(branch.val())
+
+
+
+        
+
+tree = Tree(board)
+tree.makeTree()
+
+tree.exploreTree()
